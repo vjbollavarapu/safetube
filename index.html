@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="">
+		<meta name="description" content="SafeTUBE">
 		<meta name="author" content="">
 
 		<title>Safe Tube - Video Gallery</title>
@@ -16,51 +16,50 @@
 
 	</head>
 
-	<body>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-		<div class="container">
-			<a class="navbar-brand" href="#"><img src="content/1a.jpg" width="10%"></a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<div class="collapse navbar-collapse" id="navbarResponsive">
-				<input type="file" id="vfile" name="vfile"/>
+	<body onload="authorise()">
+		<!-- Navigation -->
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="#"><img src="content/1a.jpg" width="10%"></a>
+				<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+				</div>
+				<!--
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+				<ul class="navbar-nav ml-auto">
+				<li class="nav-item active">
+				<a class="nav-link" href="#">Home
+				<span class="sr-only">(current)</span>
+				</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" href="#">About</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" href="#">Services</a>
+				</li>
+				<li class="nav-item">
+				<a class="nav-link" href="#">Contact</a>
+				</li>
+				</ul>
+				</div>-->
 			</div>
-			<!--
-			<div class="collapse navbar-collapse" id="navbarResponsive">
-			<ul class="navbar-nav ml-auto">
-			<li class="nav-item active">
-			<a class="nav-link" href="#">Home
-			<span class="sr-only">(current)</span>
-			</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link" href="#">About</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link" href="#">Services</a>
-			</li>
-			<li class="nav-item">
-			<a class="nav-link" href="#">Contact</a>
-			</li>
-			</ul>
-			</div>-->
-		</div>
-    </nav>
+		</nav>
 
 		<!-- Page Content -->
 		<div class="container">
 			<h4 class="my-4 text-center text-lg-left">safeMutableData Gallery</h4>
 			<div id="imgDiv" class="row text-center text-lg-left">
-				<!--
-				<div class="col-lg-3 col-md-4 col-xs-6">
-					<a href="#" class="d-block mb-4 h-100">
-						<img class="img-fluid img-thumbnail" src="http://placehold.it/400x300" alt="">
-					</a>
+				<div class="col-lg-10 col-md-4 col-xs-6">
+					<input type="file" id="vfile" name="vfile" accept="video/*" formenctype="multipart/form-data"/>
+					<button type="button" id="btnupload" onclick="uploadVideo()">Upload</button>
 				</div>
-				-->
+				<div class="col-lg-10 col-md-4 col-xs-6">
+					<button type="button" id="btnlist" onclick="listVideos()"> List Videos </button>
+					<select id="selvideo" class="img-fluid im-thumbnail"></select>
+				</div>
 			</div>
 		</div>
 		<!-- /.container -->
@@ -77,47 +76,49 @@
 		<script src="vendor/jquery/jquery.min.js"></script>
 		<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 		<script type="text/javascript">
+			//Public Variables
+			var app = {
+				name : 'safetube',
+				id : 'safetube',
+				version : '1.0',
+				vendor : 'MaidSafe BabySAFE',
+			};
+			
+			var privileges = {
+				'_public' : [
+					'Read',
+					'Insert',
+					'Update',
+					'Delete',
+					'ManagePermissions',
+				],
+				'_publicNames' : [
+					'Read',
+					'Insert',
+					'Update',
+					'Delete',
+					'ManagePermissions'
+				]
+			};
+			var owncontainer = {
+				own_container: true
+			};
+			
+			var container = 'apps/safetube';
+			//--End of Public variables
 			function authorise(){
-				var app = {
-					name = 'safetube-vijay',
-					id = 'safetube-vijay',
-					version = '1.0',
-					vendor = 'SafeTube.Vijay',
-				};
-				
-				var privileges = {
-					'_public' : [
-						'Read',
-						'Insert',
-						'Update',
-						'Delete',
-						'ManagePermissions',
-					],
-					'_publicNames' : [
-						'Read',
-						'Insert',
-						'Update',
-						'Delete',
-						'ManagePermissions'
-					]
-				};
-				
-				var container = {
-					safetube_vijay_container: true
-				};
-				
 				window.safeApp.initialise(app)
 					.then((appToken) => {
 						//Tracking
 						console.log('Initialising Token - ' + appToken );
-						window.safeApp.authorise(appToken, privileges, container)
+						window.safeApp.authorise(appToken, privileges, owncontainer)
 							.then((auth) => {
 								window.safeApp.connectAuthorised(appToken, auth)
 									.then((authorisedAppToken) => {
 										window.auth = authorisedAppToken;
 										//Tracking
 										console.log('Authorised App Token ' + authorisedAppToken );
-										listVideos();
+										//listVideos();
 									});
 							});
 					
@@ -128,18 +129,18 @@
 			}
 					
 			function listVideos(){
-				var _container = 'vijay/safetube-container';
-				
-				window.safeApp.getContainer(auth, _container)
+				window.safeApp.getContainer(auth, container)
 					.then((mdHandle) => {
 						//Tracking
 						console.log('Handle ' + mdHandle);
 						window.safeMutableData.getEntries(mdHandle)
 							.then((entries) => {
+								window.safeMutableDataEntries.len(entries).then((len) => console.log("Number of entries found in the container (" + container + ") is :" + len));
 								window.safeMutableDataEntries.forEach(entries, (key, value) => {
 									//Tracking
 									console.log('File found ' + new TextDecoder("utf-8").decode(key));
-									document.getElementById('imgDiv').innerHTML += '<div class="col-lg-3 col-md-4 col-xs-6"><a href="#" class="d-block mb-4 h-100"><video class="img-fluid img-thumbnail video-js" controls> <source src="data:video/' + (new TextDecoder("utf-8").decode(key)).split('.').pop() + ';base64,' + arrayBufferToBase64(value.buf) + '" type="video/' + (new TextDecoder("utf-8").decode(key)).split('.').pop() + '"></video></a></div>';
+									//document.getElementById('imgDiv').innerHTML += '<div class="col-lg-3 col-md-4 col-xs-6"><a href="#" class="d-block mb-4 h-100"><video class="img-fluid img-thumbnail video-js" controls> <source src="data:video/' + (new TextDecoder("utf-8").decode(key)).split('.').pop() + ';base64,' + arrayBufferToBase64(value.buf) + '" type="video/' + (new TextDecoder("utf-8").decode(key)).split('.').pop() + '"></video></a></div>';
+									addOptionToSelect(document.getElementById("selvideo"), new TextDecoder("utf-8").decode(key),  new TextDecoder("utf-8").decode(key));
 								});
 							});
 					},
@@ -150,7 +151,7 @@
 			
 			function arrayBufferToBase64(_buffer) {
 				var _binary = '';
-				var _bytes = new Uint8Aray(_buffer);
+				var _bytes = new Uint8Array(_buffer);
 				var _len = _bytes.byteLength;
 				
 				for (var inc  = 0; inc < _len; inc++) {
@@ -161,35 +162,38 @@
 			}
 			
 			function uploadVideo() {
-				var container = 'vijay/safetube-container';
 				
-				var _file = document.getElementById("vfile");
+				var input = document.getElementById("vfile");
 				var _reader = new FileReader();
 				
-				var _content = null;
-				
-				_reader.readAsArrayBuffer(new Blob([_file.files[0]]));
-				_reader.onload = function(_event) {
-					var arrayBuffer = _reader.result;
-					_content = new Uint8Aray(arrayBuffer);
-					return _content;
+				_reader.onload = function() {
+					var array = _reader.result;
 				};
+				
+				_reader.readAsArrayBuffer(input.files[0]);
+				
+				console.log('_file.files[0].name :' + input.files[0].name);
 				
 				window.safeApp.getContainer(auth, container)
 					.then((mdHandle) => {
 						window.safeMutableData.newMutation(auth)
 							.then((mutationHandle) => 
-								window.safeMutableDataMutation.insert(mutationHandle, file.files[0].name, _content).then() =>
-									window.safeMutableData.applyEntriesMutation(mdHandle, mutationHandle)).then(() =>
-										//Tracking
-										console.log('New entry committed to the network');
-									)
+								window.safeMutableDataMutation.insert(mutationHandle, input.files[0].name, _reader.result).then(() =>
+									console.log('New mutation entry has been committed to the network. Container : ' + container)));
 					},
 					(err) => {
-						//Error Tracking
-						console.error('Error uploading video ' + err);
+						console.error(err);
 					});
 			}
+			
+			function addOptionToSelect(_select, _value, _text) {
+				var option = document.createElement('OPTION');
+				option.value = _value;
+				option.text = _text;
+				
+				_select.add(option);
+			}
+			
 		</script>
 	</body>
 </html>
